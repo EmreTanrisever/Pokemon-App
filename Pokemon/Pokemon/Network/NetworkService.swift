@@ -9,12 +9,12 @@ import Foundation
 
 protocol NetworkServiceInterface {
     
-    func fetchPokemons(completion: @escaping(Result<Pokemons, NetworkError>) -> Void)
+    func fetchPokemons(completion: @escaping(Result<PokemonsResponse, NetworkError>) -> Void)
 }
 
 final class NetworkService: NetworkServiceInterface {
     
-    func fetchPokemons(completion: @escaping(Result<Pokemons, NetworkError>) -> Void) {
+    func fetchPokemons(completion: @escaping(Result<PokemonsResponse, NetworkError>) -> Void) {
         guard let url = PokemonsRequestModel.shared.createURL(with: nil) else { return }
         NetworkManager.shared.sendRequest(urlRequest: url) { response in
             completion(response)

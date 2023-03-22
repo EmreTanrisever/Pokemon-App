@@ -8,6 +8,7 @@
 import Foundation
 
 final class PokemonsRequestModel: BaseRequestModel {
+    
     static let shared = PokemonsRequestModel()
     
     override var schema: String {
