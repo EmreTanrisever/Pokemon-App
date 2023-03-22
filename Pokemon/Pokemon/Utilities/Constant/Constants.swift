@@ -1,5 +1,5 @@
 //
-//  Constant.swift
+//  Constants.swift
 //  Pokemon
 //
 //  Created by Emre Tanrısever on 22.03.2023.
