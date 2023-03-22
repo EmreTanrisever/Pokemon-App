@@ -32,7 +32,7 @@ class BaseRequestModel: BaseRequestModelInterface {
             [:]
         }
     
-    func createURL(with pokemonID: Int?) -> URLRequest? {
+    func createURL(with pokemonName: String?) -> URLRequest? {
         var component = URLComponents()
         component.scheme = schema
         component.host = host
@@ -40,7 +40,7 @@ class BaseRequestModel: BaseRequestModelInterface {
         
         var pathWithID = ""
         
-        if let id = pokemonID {
+        if let id = pokemonName {
             pathWithID = "\(path)/\(id)"
             component.path = pathWithID
         } else {
