@@ -18,6 +18,8 @@ final class HomeController: UIViewController, HomeControllerInterface {
     private let pokemonsTableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.register(PokemonsTableViewCell.self, forCellReuseIdentifier: PokemonsTableViewCell.identifier)
+        tableView.rowHeight = 100
         return tableView
     }()
     
@@ -62,6 +64,13 @@ extension HomeController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        UITableViewCell()
+        guard let cell = pokemonsTableView.dequeueReusableCell(
+            withIdentifier: PokemonsTableViewCell.identifier,
+            for: indexPath
+        ) as? PokemonsTableViewCell else  {
+            return UITableViewCell()
+        }
+        
+        return cell
     }
 }
