@@ -7,19 +7,21 @@
 
 import UIKit
 
-class StatsCollectionViewCell: UICollectionViewCell {
+final class StatsCollectionViewCell: UICollectionViewCell {
     static let identifier = "StatsCollectionViewCell"
 
     private let statLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = UIColor.white
+        label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         return label
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         // Content view kısmı yani ekleme kısmı buraya gelecek.
-        contentView.backgroundColor = .systemGray6
+        contentView.backgroundColor = .systemBlue
         contentView.layer.cornerRadius = 8
     }
     
