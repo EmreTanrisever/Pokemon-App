@@ -6,24 +6,208 @@
 //
 
 import UIKit
+import Kingfisher
 
-class DetailViewController: UIViewController {
+protocol DetailViewControllerInterface: AnyObject {
+    
+    func configure()
+    func createTypeLabel(type: TypeOfPokemon)
+    func createTypesLabel(types: [TypeOfPokemon])
+    func reloadData()
+}
 
+final class DetailViewController: UIViewController, DetailViewControllerInterface {
+    
+    private let pokemonImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.cornerRadius = 4
+        imageView.contentMode = .scaleAspectFit
+        imageView.backgroundColor = UIColor.systemGray6
+        return imageView
+    }()
+    
+    private let firstTypeLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = UIColor.white
+        label.backgroundColor = UIColor.systemBlue
+        label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+        label.textAlignment = .center
+        label.layer.cornerRadius = 4
+        label.layer.masksToBounds = true
+        return label
+    }()
+    
+    private let secondTypeLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = UIColor.white
+        label.backgroundColor = UIColor.systemBlue
+        label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+        label.textAlignment = .center
+        label.layer.cornerRadius = 4
+        label.layer.masksToBounds = true
+        return label
+    }()
+    
+    private let effectLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        label.textAlignment = .center
+        label.backgroundColor = UIColor.systemGray6
+        label.layer.cornerRadius = 4
+        label.layer.masksToBounds = true
+        return label
+    }()
+    
+    private lazy var statsCollectionView: UICollectionView = {
+        let collectionViewLayout = UICollectionViewFlowLayout()
+        collectionViewLayout.scrollDirection = .horizontal
+        collectionViewLayout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        collectionViewLayout.itemSize = CGSize(width: 200, height: 40)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
+        collectionView.register(StatsCollectionViewCell.self, forCellWithReuseIdentifier: StatsCollectionViewCell.identifier)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.showsHorizontalScrollIndicator = false
+        return collectionView
+    }()
+
+    private let shortEffectLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        label.textAlignment = .center
+        label.backgroundColor = UIColor.systemGray6
+        label.layer.cornerRadius = 4
+        label.layer.masksToBounds = true
+        return label
+    }()
+    
+    private lazy var viewModel = DetailViewModel(self)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        viewModel.viewDidLoad()
+    }
+}
 
-        // Do any additional setup after loading the view.
+// MARK: - ConfigureUI
+extension DetailViewController {
+    
+    func configure() {
+        view.backgroundColor = .white
+        
+        view.addSubviews(pokemonImageView, effectLabel, statsCollectionView, shortEffectLabel)
+        statsCollectionView.dataSource = self
+        statsCollectionView.delegate = self
+        setConstraints()
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    private func setConstraints() {
+        NSLayoutConstraint.activate([
+            pokemonImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            pokemonImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            pokemonImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            pokemonImageView.heightAnchor.constraint(equalToConstant: 250),
+            
+            effectLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            effectLabel.topAnchor.constraint(equalTo: pokemonImageView.bottomAnchor, constant: 16),
+            effectLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            statsCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            statsCollectionView.topAnchor.constraint(equalTo: effectLabel.bottomAnchor, constant: 16),
+            statsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            statsCollectionView.heightAnchor.constraint(equalToConstant: 40),
+            
+            shortEffectLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            shortEffectLabel.topAnchor.constraint(equalTo: statsCollectionView.bottomAnchor, constant: 16),
+            shortEffectLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+        ])
     }
-    */
+}
 
+// MARK: - Type Label
+extension DetailViewController {
+    
+    func createTypeLabel(type: TypeOfPokemon) {
+        view.addSubview(firstTypeLabel)
+        
+        firstTypeLabel.text = type.name.uppercased()
+        firstTypeLabel.backgroundColor = UIColor(named: type.name)
+        NSLayoutConstraint.activate([
+            firstTypeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            firstTypeLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            firstTypeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            firstTypeLabel.heightAnchor.constraint(equalToConstant: 40)
+         ])
+    }
+    
+    func createTypesLabel(types: [TypeOfPokemon]) {
+        view.addSubviews(firstTypeLabel, secondTypeLabel)
+        let firstName = types[0].name
+        let secondName = types[1].name
+        
+        firstTypeLabel.text = firstName.uppercased()
+        secondTypeLabel.text = secondName.uppercased()
+        firstTypeLabel.backgroundColor = UIColor(named: firstName)
+        secondTypeLabel.backgroundColor = UIColor(named: secondName)
+        
+        NSLayoutConstraint.activate([
+            firstTypeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            firstTypeLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            firstTypeLabel.heightAnchor.constraint(equalToConstant: 40),
+            firstTypeLabel.widthAnchor.constraint(equalToConstant: (view.frame.width / 2 - 24)),
+            
+            secondTypeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            secondTypeLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            secondTypeLabel.heightAnchor.constraint(equalToConstant: 40),
+            secondTypeLabel.widthAnchor.constraint(equalToConstant: (view.frame.width / 2 - 24))
+        ])
+    }
+}
+
+extension DetailViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        guard let stats = viewModel.pokemon?.stats else { return 0 }
+        return stats.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let stats = viewModel.pokemon?.stats else { return UICollectionViewCell() }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: StatsCollectionViewCell.identifier, for: indexPath) as? StatsCollectionViewCell else { return UICollectionViewCell() }
+        cell.setData(statName: "\(stats[indexPath.row].stat.name.uppercased())", baseStat: stats[indexPath.row].base_stat)
+        return cell
+    }
+}
+
+extension DetailViewController {
+    
+    func setData(pokemon: PokemonDetail) {
+        viewModel.pokemon = pokemon
+        viewModel.getAbility(id: pokemon.id)
+        title = pokemon.name.uppercased()
+        guard let url = URL(string: pokemon.sprites.other.home.front_default) else {
+            return
+        }
+        DispatchQueue.main.async {
+            self.pokemonImageView.kf.setImage(with: url)
+        }
+        viewModel.returnTypeCount(type: pokemon.types)
+    }
+    
+    func reloadData() {
+        guard let pokemonAbility = viewModel.pokemonAbility else { return }
+        effectLabel.text = """
+        \nEffect
+        \(pokemonAbility.effect)\n
+        """
+        shortEffectLabel.text = """
+        \(pokemonAbility.short_effect)
+        """
+    }
 }
