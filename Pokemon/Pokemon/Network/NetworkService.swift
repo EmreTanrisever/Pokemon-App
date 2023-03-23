@@ -11,6 +11,7 @@ protocol NetworkServiceInterface {
     
     func fetchPokemons(completion: @escaping(Result<PokemonsResponse, NetworkError>) -> Void)
     func fetchDetailOfPokemons(name: String, completion: @escaping(Result<PokemonDetail, NetworkError>) -> Void)
+    func fetchAbilityOfPokemon(id: Int, completion: @escaping(Result<PokemonAbility, NetworkError>) -> Void)
 }
 
 final class NetworkService: NetworkServiceInterface {
