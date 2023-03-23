@@ -28,4 +28,11 @@ final class NetworkService: NetworkServiceInterface {
             completion(response)
         }
     }
+    
+    func fetchAbilityOfPokemon(id: Int, completion: @escaping(Result<PokemonAbility, NetworkError>) -> Void) {
+        guard let url = PokemonsAbilitiesRequestModel.shared.createURL(with: id) else { return }
+        NetworkManager.shared.sendRequest(urlRequest: url) { response in
+            completion(response)
+        }
+    }
 }
