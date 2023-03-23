@@ -32,20 +32,23 @@ class BaseRequestModel: BaseRequestModelInterface {
             [:]
         }
     
-    func createURL(with pokemonName: String?) -> URLRequest? {
+    func createURL(with typeOfPath: Any?) -> URLRequest? {
         var component = URLComponents()
         component.scheme = schema
         component.host = host
         var items: [URLQueryItem] = []
         
-        var pathWithID = ""
         
-        if let id = pokemonName {
-            pathWithID = "\(path)/\(id)"
-            component.path = pathWithID
+        if let typeOfPath = typeOfPath {
+            if path.contains("ability") {
+                guard let id = typeOfPath as? Int else { return nil}
+                component.path = createNewPath(id: id)
+            } else {
+                guard let name = typeOfPath as? String else { return nil}
+                component.path = createNewPath(name: name)
+            }
         } else {
             component.path = path
-            
         }
         
         for (key, value) in queryItems {
@@ -60,5 +63,13 @@ class BaseRequestModel: BaseRequestModelInterface {
         } else {
             return nil
         }
+    }
+    
+    private func createNewPath(name: String) -> String {
+        return "\(path)/\(name)"
+    }
+    
+    private func createNewPath(id: Int) -> String {
+        return "\(path)/\(id)"
     }
 }
