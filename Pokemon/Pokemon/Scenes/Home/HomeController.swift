@@ -8,6 +8,7 @@
 import UIKit
 
 protocol HomeControllerInterface: AnyObject {
+    
     func configure()
     func prepareTableView()
     func reloadDataTableView()
@@ -19,7 +20,7 @@ final class HomeController: UIViewController, HomeControllerInterface {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(PokemonsTableViewCell.self, forCellReuseIdentifier: PokemonsTableViewCell.identifier)
-        tableView.rowHeight = 100
+        tableView.rowHeight = 80
         return tableView
     }()
     
@@ -32,7 +33,11 @@ final class HomeController: UIViewController, HomeControllerInterface {
 }
 
 extension HomeController {
+    
     func configure() {
+        
+        title = "Pokemons"
+        navigationController?.navigationBar.prefersLargeTitles = true
         view.addSubview(pokemonsTableView)
         
         setConstraints()
@@ -48,7 +53,7 @@ extension HomeController {
     }
 }
 
-extension HomeController: UITableViewDelegate, UITableViewDataSource {
+extension HomeController: UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate {
     
     func prepareTableView() {
         pokemonsTableView.delegate = self
@@ -60,7 +65,7 @@ extension HomeController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return viewModel.pokemonsDetail.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -70,7 +75,13 @@ extension HomeController: UITableViewDelegate, UITableViewDataSource {
         ) as? PokemonsTableViewCell else  {
             return UITableViewCell()
         }
-        
+        cell.setData(pokemon: viewModel.pokemonsDetail[indexPath.row])
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let controller = DetailViewController()
+        controller.setData(pokemon: viewModel.pokemonsDetail[indexPath.row])
+        navigationController?.pushViewController(controller, animated: true)
     }
 }
