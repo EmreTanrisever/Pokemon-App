@@ -13,6 +13,6 @@ extension Constants {
         static let pokemonSchema = "https"
         static let pokemonHost = "pokeapi.co"
         static let pokemonPath = "/api/v2/pokemon"
-        
+        static let abilityPath = "/api/v2/ability"
     }
 }
