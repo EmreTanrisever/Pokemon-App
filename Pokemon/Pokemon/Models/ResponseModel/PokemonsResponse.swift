@@ -12,3 +12,14 @@ struct PokemonsResponse: Codable {
     let previous: String?
     let results: [Pokemons]
 }
+
+struct PokemonDetail: Codable {
+    let id: Int
+    let height: Int
+    let name: String
+    let order: Int
+    let sprites: Sprites
+    let stats: [Stats]
+    let types: [Types]
+    let weight: Int
+}
