@@ -44,12 +44,12 @@ extension DetailViewModel: DetailViewModelInterface {
     }
     
     func getAbility(id: Int) {
-        service.fetchAbilityOfPokemon(id: id) { response in
+        service.fetchAbilityOfPokemon(id: id) { [weak self] response in
             switch response {
             case .success(let ability):
                 DispatchQueue.main.async {
-                    self.pokemonAbility = ability.effect_entries[1]
-                    self.view?.reloadData()
+                    self?.pokemonAbility = ability.effect_entries[1]
+                    self?.view?.reloadData()
                 }
             case .failure(let error):
                 print(error)

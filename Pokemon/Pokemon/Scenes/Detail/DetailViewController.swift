@@ -18,6 +18,20 @@ protocol DetailViewControllerInterface: AnyObject {
 
 final class DetailViewController: UIViewController, DetailViewControllerInterface {
     
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.isScrollEnabled = true
+        scrollView.contentSize = (CGSize(width: 600, height: 800))
+        return scrollView
+    }()
+    
+    private let contentView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private let pokemonImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -102,7 +116,9 @@ extension DetailViewController {
     func configure() {
         view.backgroundColor = .white
         
-        view.addSubviews(pokemonImageView, effectLabel, statsCollectionView, shortEffectLabel)
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        contentView.addSubviews(pokemonImageView, effectLabel, statsCollectionView, shortEffectLabel)
         statsCollectionView.dataSource = self
         statsCollectionView.delegate = self
         setConstraints()
@@ -110,23 +126,35 @@ extension DetailViewController {
     
     private func setConstraints() {
         NSLayoutConstraint.activate([
-            pokemonImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            pokemonImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            pokemonImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalToConstant: view.frame.width),
+            contentView.heightAnchor.constraint(equalToConstant: 850),
+            
+            pokemonImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            pokemonImageView.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor),
+            pokemonImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             pokemonImageView.heightAnchor.constraint(equalToConstant: 250),
             
-            effectLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            effectLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             effectLabel.topAnchor.constraint(equalTo: pokemonImageView.bottomAnchor, constant: 16),
-            effectLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            effectLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            statsCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            statsCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             statsCollectionView.topAnchor.constraint(equalTo: effectLabel.bottomAnchor, constant: 16),
-            statsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            statsCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             statsCollectionView.heightAnchor.constraint(equalToConstant: 40),
             
-            shortEffectLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            shortEffectLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             shortEffectLabel.topAnchor.constraint(equalTo: statsCollectionView.bottomAnchor, constant: 16),
-            shortEffectLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            shortEffectLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
         ])
     }
 }
@@ -140,9 +168,9 @@ extension DetailViewController {
         firstTypeLabel.text = type.name.uppercased()
         firstTypeLabel.backgroundColor = UIColor(named: type.name)
         NSLayoutConstraint.activate([
-            firstTypeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            firstTypeLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            firstTypeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            firstTypeLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            firstTypeLabel.topAnchor.constraint(equalTo: shortEffectLabel.bottomAnchor, constant: 16),
+            firstTypeLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             firstTypeLabel.heightAnchor.constraint(equalToConstant: 40)
          ])
     }
@@ -158,13 +186,13 @@ extension DetailViewController {
         secondTypeLabel.backgroundColor = UIColor(named: secondName)
         
         NSLayoutConstraint.activate([
-            firstTypeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            firstTypeLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            firstTypeLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            firstTypeLabel.topAnchor.constraint(equalTo: shortEffectLabel.bottomAnchor, constant: 16),
             firstTypeLabel.heightAnchor.constraint(equalToConstant: 40),
             firstTypeLabel.widthAnchor.constraint(equalToConstant: (view.frame.width / 2 - 24)),
             
-            secondTypeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            secondTypeLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            secondTypeLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            secondTypeLabel.topAnchor.constraint(equalTo: shortEffectLabel.bottomAnchor, constant: 16),
             secondTypeLabel.heightAnchor.constraint(equalToConstant: 40),
             secondTypeLabel.widthAnchor.constraint(equalToConstant: (view.frame.width / 2 - 24))
         ])
