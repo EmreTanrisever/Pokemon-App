@@ -125,18 +125,19 @@ extension DetailViewController {
     }
     
     private func setConstraints() {
+        
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalToConstant: view.frame.width),
-            contentView.heightAnchor.constraint(equalToConstant: 850),
+            contentView.heightAnchor.constraint(equalToConstant: view.frame.height),
             
             pokemonImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             pokemonImageView.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor),
