@@ -41,12 +41,12 @@ extension HomeViewModel: HomeViewModelInterface {
     }
     
     func getPokemons() {
-        service.fetchPokemons { response in
+        service.fetchPokemons { [weak self] response in
             switch response {
             case .success(let pokemons):
-                self.pokemons.append(pokemons)
+                self?.pokemons.append(pokemons)
                 for item in pokemons.results {
-                    self.getDetailOfPokemon(name: item.name)
+                    self?.getDetailOfPokemon(name: item.name)
                 }
             case .failure(let error):
                 print(error)
@@ -55,11 +55,11 @@ extension HomeViewModel: HomeViewModelInterface {
     }
     
     func getDetailOfPokemon(name: String) {
-        service.fetchDetailOfPokemons(name: name) { response in
+        service.fetchDetailOfPokemons(name: name) { [weak self] response in
             switch response {
             case .success(let pokemonDetail):
-                self.pokemonsDetail.append(pokemonDetail)
-                self.view?.reloadDataTableView()
+                self?.pokemonsDetail.append(pokemonDetail)
+                self?.view?.reloadDataTableView()
             case .failure(let error):
                 print(error)
             }
