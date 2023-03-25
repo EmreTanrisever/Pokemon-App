@@ -61,7 +61,7 @@ extension HomeController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
     }
     
     func reloadDataTableView() {
-        pokemonsTableView.reloadData()
+        self.pokemonsTableView.reloadData()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -83,5 +83,11 @@ extension HomeController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
         let controller = DetailViewController()
         controller.setData(pokemon: viewModel.pokemonsDetail[indexPath.row])
         navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if scrollView.contentOffset.y > self.pokemonsTableView.contentSize.height - 700 {
+            self.viewModel.getNextPage(pagination: true)
+        }        
     }
 }

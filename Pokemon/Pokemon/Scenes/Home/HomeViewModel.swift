@@ -23,6 +23,7 @@ final class HomeViewModel {
     
     weak var view: HomeControllerInterface?
     private let service = NetworkService()
+    var isPaging = false
     
     var pokemons: [PokemonsResponse] = []
     var pokemonsDetail: [PokemonDetail] = []
@@ -44,9 +45,12 @@ extension HomeViewModel: HomeViewModelInterface {
         service.fetchPokemons { [weak self] response in
             switch response {
             case .success(let pokemons):
-                self?.pokemons.append(pokemons)
-                for item in pokemons.results {
-                    self?.getDetailOfPokemon(name: item.name)
+                DispatchQueue.main.async { [weak self] in
+                    self?.pokemons.append(pokemons)
+                    for item in pokemons.results {
+                        self?.getDetailOfPokemon(name: item.name)
+                        self?.view?.reloadDataTableView()
+                    }
                 }
             case .failure(let error):
                 print(error)
@@ -58,13 +62,37 @@ extension HomeViewModel: HomeViewModelInterface {
         service.fetchDetailOfPokemons(name: name) { [weak self] response in
             switch response {
             case .success(let pokemonDetail):
-                self?.pokemonsDetail.append(pokemonDetail)
-                self?.view?.reloadDataTableView()
+                DispatchQueue.main.async { [weak self] in
+                    self?.pokemonsDetail.append(pokemonDetail)
+                    self?.view?.reloadDataTableView()
+                }
             case .failure(let error):
                 print(error)
             }
         }
     }
     
- 
+    func getNextPage(pagination: Bool) {
+        if pagination {
+            isPaging = true
+        }
+        guard let url = pokemons.last?.next else { return }
+        service.fetchDetailOfPokemons(url: url) { response in
+            switch response {
+            case .success(let pokemons):
+                DispatchQueue.main.async { [weak self] in
+                    self?.pokemons.append(pokemons)
+                    for item in pokemons.results {
+                        self?.getDetailOfPokemon(name: item.name)
+                    }
+                }
+            case .failure(let error):
+                print(error)
+            }
+            
+        }
+        if isPaging {
+            isPaging = false
+        }
+    }
 }
