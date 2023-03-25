@@ -47,7 +47,7 @@ extension DetailViewModel: DetailViewModelInterface {
         service.fetchAbilityOfPokemon(id: id) { [weak self] response in
             switch response {
             case .success(let ability):
-                DispatchQueue.main.async {
+                DispatchQueue.main.async { [weak self] in
                     self?.pokemonAbility = ability.effect_entries[1]
                     self?.view?.reloadData()
                 }

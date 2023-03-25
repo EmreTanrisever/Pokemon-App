@@ -114,8 +114,8 @@ extension PokemonsTableViewCell {
         guard let url = URL(string: pokemon.sprites.other.home.front_default) else {
             return
         }
-        DispatchQueue.main.async {
-            self.pokemonImageView.kf.setImage(with: url)
+        DispatchQueue.main.async { [weak self] in
+            self?.pokemonImageView.kf.setImage(with: url)
         }
         pokemonNameLabel.text = pokemon.name.uppercased()
         pokemonOrderLabel.text = "  #\(pokemon.order)  "

@@ -125,12 +125,11 @@ extension DetailViewController {
     }
     
     private func setConstraints() {
-        
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
@@ -215,7 +214,6 @@ extension DetailViewController: UICollectionViewDataSource, UICollectionViewDele
 }
 
 extension DetailViewController {
-    
     func setData(pokemon: PokemonDetail) {
         viewModel.pokemon = pokemon
         viewModel.getAbility(id: pokemon.id)
