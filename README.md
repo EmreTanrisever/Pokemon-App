@@ -20,11 +20,12 @@ This app was created as two pages. on the first page "pokeapi.co " pokemon withd
 </ul>
 
 <div align="center">
-    | Pagination | List Screen | Detail Screen | Detail Screen | 
 
-| ------------- | ------------- | --------------- | --------------- |
-| <img src="images/gif.gif" alt="ss" width="220"/> | <img src="images/listscreen.png" alt="ss" width="220"/> | <img src="images/detailscreen1.png" alt="ss" width="220"/>  | <img src="images/detailscreen2.png" alt="ss" width="220"/>  |
+| Pagination GIF | List Screen |
+| --------------- | --------------- |
+| <img src="images/gif.gif" alt="ss" width="220"/>  | <img src="images/listscreen.png" alt="ss" width="220"/>  |
 
-
-</video>
+| Detail Screen | Detail Screen |
+| --------------- | --------------- |
+| <img src="images/detailscreen1.png" alt="ss" width="220"/>  | <img src="images/detailscreen2.png" alt="ss" width="220"/>  |
 </div>
