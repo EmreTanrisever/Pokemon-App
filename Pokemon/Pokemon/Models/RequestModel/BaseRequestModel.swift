@@ -15,22 +15,22 @@ protocol BaseRequestModelInterface {
 }
 
 class BaseRequestModel: BaseRequestModelInterface {
-
+    
     var schema: String {
-            "https"
-        }
-        
-        var host: String {
-            "api.themoviedb.org"
-        }
-        
-        var path: String {
-            ""
-        }
-        
-        var queryItems: [String : Any] {
-            [:]
-        }
+        "https"
+    }
+    
+    var host: String {
+        "pokeapi.co"
+    }
+    
+    var path: String {
+        ""
+    }
+    
+    var queryItems: [String : Any] {
+        [:]
+    }
     
     func createURL(with typeOfPath: Any?) -> URLRequest? {
         var component = URLComponents()
@@ -55,7 +55,7 @@ class BaseRequestModel: BaseRequestModelInterface {
             let queryItem = URLQueryItem(name: key, value: "\(value)")
             items.append(queryItem)
         }
-
+        
         component.queryItems = items
         
         if let url = component.url {

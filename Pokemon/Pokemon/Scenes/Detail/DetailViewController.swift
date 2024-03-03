@@ -14,9 +14,11 @@ protocol DetailViewControllerInterface: AnyObject {
     func createTypeLabel(type: TypeOfPokemon)
     func createTypesLabel(types: [TypeOfPokemon])
     func reloadData()
+    func startAnimating()
+    func stopAnimating()
 }
 
-final class DetailViewController: UIViewController, DetailViewControllerInterface {
+final class DetailViewController: UIViewController {
     
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -37,7 +39,6 @@ final class DetailViewController: UIViewController, DetailViewControllerInterfac
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 4
         imageView.contentMode = .scaleAspectFit
-        imageView.backgroundColor = UIColor.systemGray6
         return imageView
     }()
     
@@ -88,7 +89,7 @@ final class DetailViewController: UIViewController, DetailViewControllerInterfac
         collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
-
+    
     private let shortEffectLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -99,6 +100,13 @@ final class DetailViewController: UIViewController, DetailViewControllerInterfac
         label.layer.cornerRadius = 4
         label.layer.masksToBounds = true
         return label
+    }()
+    
+    private let spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView()
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        spinner.color = .systemRed
+        return spinner
     }()
     
     private lazy var viewModel = DetailViewModel(self)
@@ -112,17 +120,6 @@ final class DetailViewController: UIViewController, DetailViewControllerInterfac
 
 // MARK: - ConfigureUI
 extension DetailViewController {
-    
-    func configure() {
-        view.backgroundColor = .white
-        
-        view.addSubview(scrollView)
-        scrollView.addSubview(contentView)
-        contentView.addSubviews(pokemonImageView, effectLabel, statsCollectionView, shortEffectLabel)
-        statsCollectionView.dataSource = self
-        statsCollectionView.delegate = self
-        setConstraints()
-    }
     
     private func setConstraints() {
         NSLayoutConstraint.activate([
@@ -155,12 +152,24 @@ extension DetailViewController {
             shortEffectLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             shortEffectLabel.topAnchor.constraint(equalTo: statsCollectionView.bottomAnchor, constant: 16),
             shortEffectLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            
+            spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
 }
 
-// MARK: - Type Label
-extension DetailViewController {
+extension DetailViewController: DetailViewControllerInterface {
+    func configure() {
+        view.backgroundColor = .white
+        
+        view.addSubview(scrollView)
+        view.addSubview(spinner)
+        scrollView.addSubview(contentView)
+        contentView.addSubviews(pokemonImageView, effectLabel, statsCollectionView, shortEffectLabel)
+        statsCollectionView.dataSource = self
+        setConstraints()
+    }
     
     func createTypeLabel(type: TypeOfPokemon) {
         view.addSubview(firstTypeLabel)
@@ -172,7 +181,7 @@ extension DetailViewController {
             firstTypeLabel.topAnchor.constraint(equalTo: shortEffectLabel.bottomAnchor, constant: 16),
             firstTypeLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             firstTypeLabel.heightAnchor.constraint(equalToConstant: 40)
-         ])
+        ])
     }
     
     func createTypesLabel(types: [TypeOfPokemon]) {
@@ -197,16 +206,54 @@ extension DetailViewController {
             secondTypeLabel.widthAnchor.constraint(equalToConstant: (view.frame.width / 2 - 24))
         ])
     }
+    
+    func reloadData() {
+        pokemonImageView.backgroundColor = UIColor.systemGray6
+        
+        if let pokemon = viewModel.pokemon {
+            title = pokemon.name.uppercased()
+            guard let url = URL(string: pokemon.sprites.other.home.front_default) else {
+                return
+            }
+            DispatchQueue.main.async {
+                self.pokemonImageView.kf.setImage(with: url)
+            }
+            DispatchQueue.main.async {
+                self.statsCollectionView.reloadData()
+            }
+            viewModel.returnTypeCount(type: pokemon.types)
+            guard let pokemonAbility = viewModel.pokemonAbility else { return }
+            effectLabel.text = """
+            \nEffect
+            \(pokemonAbility.effect)\n
+            """
+            shortEffectLabel.text = """
+            \(pokemonAbility.short_effect)
+            """
+        }
+    }
+    
+    func startAnimating() {
+        DispatchQueue.main.async {
+            self.spinner.startAnimating()
+        }
+    }
+    
+    func stopAnimating() {
+        DispatchQueue.main.async {
+            self.spinner.stopAnimating()
+        }
+    }
 }
 
-extension DetailViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+extension DetailViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let stats = viewModel.pokemon?.stats else { return 0 }
+        guard let stats = viewModel.collectionViewData?.stats else { return 0 }
         return stats.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let stats = viewModel.pokemon?.stats else { return UICollectionViewCell() }
+        guard let stats = viewModel.collectionViewData?.stats else { return UICollectionViewCell() }
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: StatsCollectionViewCell.identifier, for: indexPath) as? StatsCollectionViewCell else { return UICollectionViewCell() }
         cell.setData(statName: "\(stats[indexPath.row].stat.name.uppercased())", baseStat: stats[indexPath.row].base_stat)
         return cell
@@ -217,24 +264,5 @@ extension DetailViewController {
     func setData(pokemon: PokemonDetail) {
         viewModel.pokemon = pokemon
         viewModel.getAbility(id: pokemon.id)
-        title = pokemon.name.uppercased()
-        guard let url = URL(string: pokemon.sprites.other.home.front_default) else {
-            return
-        }
-        DispatchQueue.main.async {
-            self.pokemonImageView.kf.setImage(with: url)
-        }
-        viewModel.returnTypeCount(type: pokemon.types)
-    }
-    
-    func reloadData() {
-        guard let pokemonAbility = viewModel.pokemonAbility else { return }
-        effectLabel.text = """
-        \nEffect
-        \(pokemonAbility.effect)\n
-        """
-        shortEffectLabel.text = """
-        \(pokemonAbility.short_effect)
-        """
     }
 }

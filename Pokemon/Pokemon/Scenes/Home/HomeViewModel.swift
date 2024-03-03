@@ -38,18 +38,19 @@ extension HomeViewModel: HomeViewModelInterface {
     func viewDidLoad() {
         view?.configure()
         view?.prepareTableView()
+        view?.startAnimating()
         getPokemons()
     }
     
     func getPokemons() {
         service.fetchPokemons { [weak self] response in
+            self?.view?.startAnimating()
             switch response {
             case .success(let pokemons):
                 DispatchQueue.main.async { [weak self] in
                     self?.pokemons.append(pokemons)
                     for item in pokemons.results {
                         self?.getDetailOfPokemon(name: item.name)
-                        self?.view?.reloadDataTableView()
                     }
                 }
             case .failure(let error):
@@ -65,6 +66,7 @@ extension HomeViewModel: HomeViewModelInterface {
                 DispatchQueue.main.async { [weak self] in
                     self?.pokemonsDetail.append(pokemonDetail)
                     self?.view?.reloadDataTableView()
+                    self?.view?.stopAnimating()
                 }
             case .failure(let error):
                 print(error)

@@ -23,6 +23,7 @@ final class DetailViewModel {
     private var service = NetworkService()
     var pokemonAbility: PokemonEffect?
     var pokemon: PokemonDetail?
+    var collectionViewData: PokemonDetail?
     
     init(_ view: DetailViewControllerInterface) {
         self.view = view
@@ -33,6 +34,7 @@ extension DetailViewModel: DetailViewModelInterface {
     
     func viewDidLoad() {
         view?.configure()
+        view?.startAnimating()
     }
     
     func returnTypeCount(type: [Types]) {
@@ -49,7 +51,9 @@ extension DetailViewModel: DetailViewModelInterface {
             case .success(let ability):
                 DispatchQueue.main.async { [weak self] in
                     self?.pokemonAbility = ability.effect_entries[1]
+                    self?.collectionViewData = self?.pokemon
                     self?.view?.reloadData()
+                    self?.view?.stopAnimating()
                 }
             case .failure(let error):
                 print(error)

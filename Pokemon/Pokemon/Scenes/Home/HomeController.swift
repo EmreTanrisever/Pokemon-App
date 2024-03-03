@@ -12,9 +12,11 @@ protocol HomeControllerInterface: AnyObject {
     func configure()
     func prepareTableView()
     func reloadDataTableView()
+    func startAnimating()
+    func stopAnimating()
 }
 
-final class HomeController: UIViewController, HomeControllerInterface {
+final class HomeController: UIViewController {
 
     private let pokemonsTableView: UITableView = {
         let tableView = UITableView()
@@ -22,6 +24,12 @@ final class HomeController: UIViewController, HomeControllerInterface {
         tableView.register(PokemonsTableViewCell.self, forCellReuseIdentifier: PokemonsTableViewCell.identifier)
         tableView.rowHeight = 80
         return tableView
+    }()
+    
+    private var spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView()
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        return spinner
     }()
     
     private lazy var viewModel = HomeViewModel(self)
@@ -32,28 +40,29 @@ final class HomeController: UIViewController, HomeControllerInterface {
     }
 }
 
-extension HomeController {
+extension HomeController: HomeControllerInterface {
     
     func configure() {
         
         title = "Pokemons"
         navigationController?.navigationBar.prefersLargeTitles = true
         view.addSubview(pokemonsTableView)
+        view.addSubview(spinner)
         
         setConstraints()
     }
     
-    private func setConstraints() {
-        NSLayoutConstraint.activate([
-            pokemonsTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            pokemonsTableView.topAnchor.constraint(equalTo: view.topAnchor),
-            pokemonsTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            pokemonsTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+    func startAnimating() {
+        DispatchQueue.main.async {
+            self.spinner.startAnimating()
+        }
     }
-}
-
-extension HomeController: UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate {
+    
+    func stopAnimating() {
+        DispatchQueue.main.async {
+            self.spinner.stopAnimating()
+        }
+    }
     
     func prepareTableView() {
         pokemonsTableView.delegate = self
@@ -63,6 +72,24 @@ extension HomeController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
     func reloadDataTableView() {
         self.pokemonsTableView.reloadData()
     }
+}
+
+extension HomeController {
+    
+    private func setConstraints() {
+        NSLayoutConstraint.activate([
+            pokemonsTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            pokemonsTableView.topAnchor.constraint(equalTo: view.topAnchor),
+            pokemonsTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            pokemonsTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+}
+
+extension HomeController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.pokemonsDetail.count
@@ -78,16 +105,22 @@ extension HomeController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
         cell.setData(pokemon: viewModel.pokemonsDetail[indexPath.row])
         return cell
     }
+}
+
+extension HomeController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let controller = DetailViewController()
         controller.setData(pokemon: viewModel.pokemonsDetail[indexPath.row])
         navigationController?.pushViewController(controller, animated: true)
     }
+}
+
+extension HomeController: UIScrollViewDelegate {
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if scrollView.contentOffset.y > self.pokemonsTableView.contentSize.height - 700 {
             self.viewModel.getNextPage(pagination: true)
-        }        
+        }
     }
 }

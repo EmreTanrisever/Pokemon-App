@@ -29,5 +29,4 @@ final class PokemonsRequestModel: BaseRequestModel {
             "limit": 20
         ]
     }
-    
 }
