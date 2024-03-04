@@ -79,7 +79,7 @@ extension HomeViewModel: HomeViewModelInterface {
             isPaging = true
         }
         guard let url = pokemons.last?.next else { return }
-        service.fetchDetailOfPokemons(url: url) { response in
+        service.fetchDetailOfPokemons(url: url) { [weak self] response in
             switch response {
             case .success(let pokemons):
                 DispatchQueue.main.async { [weak self] in
@@ -87,6 +87,7 @@ extension HomeViewModel: HomeViewModelInterface {
                     for item in pokemons.results {
                         self?.getDetailOfPokemon(name: item.name)
                     }
+                    
                 }
             case .failure(let error):
                 print(error)

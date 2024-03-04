@@ -34,7 +34,6 @@ extension DetailViewModel: DetailViewModelInterface {
     
     func viewDidLoad() {
         view?.configure()
-        view?.startAnimating()
     }
     
     func returnTypeCount(type: [Types]) {
@@ -47,6 +46,7 @@ extension DetailViewModel: DetailViewModelInterface {
     
     func getAbility(id: Int) {
         service.fetchAbilityOfPokemon(id: id) { [weak self] response in
+            self?.view?.startAnimating()
             switch response {
             case .success(let ability):
                 DispatchQueue.main.async { [weak self] in

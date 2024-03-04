@@ -29,6 +29,7 @@ final class HomeController: UIViewController {
     private var spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView()
         spinner.translatesAutoresizingMaskIntoConstraints = false
+        spinner.color = .systemBlue
         return spinner
     }()
     

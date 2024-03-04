@@ -105,7 +105,7 @@ final class DetailViewController: UIViewController {
     private let spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView()
         spinner.translatesAutoresizingMaskIntoConstraints = false
-        spinner.color = .systemRed
+        spinner.color = .systemBlue
         return spinner
     }()
     
